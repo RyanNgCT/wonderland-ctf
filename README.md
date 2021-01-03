@@ -331,7 +331,7 @@ Extension:Port:Disconnect
 [FUNCTION] %s :Port %d subport %d,PxIS %lx Px->IS %lx Px->SERR %lx cmd %x TFD %x ERR %x
 ```
 
-Unfortunately, the ip address `78.216.50.84` from the search was incorrect. Someone gave me a hint that the IP address of the callee could be (e.g. `sip: 192.168.x.x`) so I decided to try that out and sure enough I managed to recover the IP address of the server!
+Unfortunately, the ip address `78.216.50.84` from the search was incorrect. Someone (@Ng Jun Da) gave me a hint that the IP address of the callee could be (e.g. `sip: 192.168.x.x`) so I decided to try that out and sure enough I managed to recover the IP address of the server!
 ```
 root@attackdefense:~# strings 4284.dmp | grep -Fi "sip:"
 ...
