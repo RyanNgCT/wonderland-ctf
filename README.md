@@ -292,3 +292,48 @@ Offset(P)          Proto    Local Address                  Foreign Address      
 0xe00195dc32d0     UDPv4    0.0.0.0:0                      *:*                                   956      svchost.exe    2019-06-26 22:57:09 UTC+0000
 0xe00195dc32d0     UDPv6    :::0                           *:*                                   956      svchost.exe    2019-06-26 22:57:09 UTC+0000
 ```
+
+Thereafter, I got the idea from the same article to use `memdump`, which enables FIs to analyse the memory contents of executables.
+```
+root@attackdefense:~# vol.py -f memory_dump.mem --profile=Win10x64_10240_17770 memdump -p 4284 --dump-dir .
+Volatility Foundation Volatility Framework 2.6.1
+************************************************************************
+Writing microsip.exe [  4284] to 4284.dmp
+```
+
+This allows us to use the `strings` command to analyse the dump file for leads. Unfortunately, it is too big when passed without arguments and we need to filter the output using `grep`. 
+
+My initial thought process was to use regex to filter out the target IP address since it was most likely in the dump.
+`root@attackdefense:~#strings 4284.dmp | grep -Fi "^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"`
+
+Unfortunately, this did not give any output. Thereafter I searched for details on the SIP protocol and found that the port was [commonly specified after the SIP proxy](https://www.microsip.org/help).
+
+> Mainly used for dialing or sending dual tones (DTMF). Various input formats are supported.
+Example: 1-800-567-46-57, 1234, 1234@sip.server.com, 1234@sip.server.com:5043, 192.168.0.55.
+
+```
+root@attackdefense:~# strings 4284.dmp | grep -Fi ":port"
+78.216.50.84":port=8080
+Extension:Port:Disconnect
+[FUNCTION] %s :PortReset Failed at port %d subport %d
+[FUNCTION] %s :port %d subport %d.
+[FUNCTION] %s :Port %d has been plug out
+[FUNCTION] %s :Port %d Link status  DET %x
+[FUNCTION] %s :Port %d Link status  DET %x successful
+[FUNCTION] %s :Port %d ,PxIS %lx Px->IS %lx Px->SERR %lx cmd %x TFD %x ERR %x
+[FUNCTION] %s :Port %d subport %d,PxIS %lx Px->IS %lx Px->SERR %lx cmd %x TFD %x ERR %x
+```
+
+Unfortunately, the ip address `78.216.50.84` was incorrect. Someone gave me a hint that the IP address of the callee could be (e.g. `sip: 192.168.x.x`) so I decided to try that out and sure enough I managed to recover the IP address of the server.
+```
+root@attackdefense:~# strings 4284.dmp | grep -Fi "sip:"
+...
+To: <sip:1111@192.168.10.129>
+...
+```
+In the strings the `To` field was specified so that was the server's IP address: `192.168.10.129`.
+
+## Step 3: 
+This was pretty much an extension of step 2
+
+
