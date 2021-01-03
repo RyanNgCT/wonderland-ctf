@@ -133,12 +133,12 @@ Offset(V)          Name                    PID   PPID   Thds     Hnds   Sess  Wo
 0xffffe00194eba080                      24...0      0      0 -------- ------      0                                                              
 0xffffe00194eba078                      393216      0      0 -------- ------      0 
 ```
-`notepad.exe` is found with the process id of `4284`.
+Through observing the output, `notepad.exe` is found with the process id of `4284`.
 
 ## Step 2: 
 A Google Search shows that SIP VOIP uses `microsip.exe`. We will need the process id of the program to create another smaller memory dump containing metadata and the data of that particular process.
 
-I used `netscan` to determine if there was an ip address tagged to the protocol, unfortunately it was incorrect.
+I used `netscan` to determine if there was an ip address tagged to the protocol, unfortunately an ip of `*:*` was displayed, so I probably had to dig deeper.
 ```
 root@attackdefense:~# vol.py -f memory_dump.mem --profile=Win10x64_10240_17770 netscan
 Volatility Foundation Volatility Framework 2.6.1
@@ -305,15 +305,18 @@ Volatility Foundation Volatility Framework 2.6.1
 Writing microsip.exe [  4284] to 4284.dmp
 ```
 
-This allows us to use the `strings` command to analyse the dump file for leads. Unfortunately, it is too big when passed without arguments and we need to filter the output using `grep`. 
+This allows us to use the `strings` command to analyse the dump file for leads. Unfortunately, it is too big when passed without arguments and we need to filter the output using the `grep` command. 
 
-My initial thought process was to use regex to filter out the target IP address since it was most likely in the dump.
+My initial thought process was to use regex to filter out the target IP address since it was most likely in the dump with the following syntax:
+
 `root@attackdefense:~#strings 4284.dmp | grep -Fi "^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"`
 
 Unfortunately, this did not give any output. Thereafter I searched for details on the SIP protocol and found that the port was [commonly specified after the SIP proxy](https://www.microsip.org/help).
 
 > Mainly used for dialing or sending dual tones (DTMF). Various input formats are supported.
 Example: 1-800-567-46-57, 1234, 1234@sip.server.com, 1234@sip.server.com:5043, 192.168.0.55.
+
+Based on this the substring `:port` seemed like a viable filter.
 
 ```
 root@attackdefense:~# strings 4284.dmp | grep -Fi ":port"
@@ -328,7 +331,7 @@ Extension:Port:Disconnect
 [FUNCTION] %s :Port %d subport %d,PxIS %lx Px->IS %lx Px->SERR %lx cmd %x TFD %x ERR %x
 ```
 
-Unfortunately, the ip address `78.216.50.84` was incorrect. Someone gave me a hint that the IP address of the callee could be (e.g. `sip: 192.168.x.x`) so I decided to try that out and sure enough I managed to recover the IP address of the server.
+Unfortunately, the ip address `78.216.50.84` from the search was incorrect. Someone gave me a hint that the IP address of the callee could be (e.g. `sip: 192.168.x.x`) so I decided to try that out and sure enough I managed to recover the IP address of the server!
 ```
 root@attackdefense:~# strings 4284.dmp | grep -Fi "sip:"
 ...
@@ -352,8 +355,11 @@ strings 3236.dmp | grep -Fi "amazon.com"
 strings 3236.dmp | grep -Fi "password\|amazon.com.*amazon.com\|password"
 ```
 
-Searching for emails with gmail's "signature" also proved futile.
-`strings 3236.dmp | grep -Fi "@gmail.com"`.
+Searching for emails with gmail's "signature" also proved futile:
+
+`strings 3236.dmp | grep -Fi "@gmail.com"`
+
+This resulted in a bunch of emails that in my opinion, served as a "distraction" and changing the search term to the partcular email did not yield results.
 
 Finally, I chanced upon [this article](https://security.stackexchange.com/questions/85980/how-to-find-passwords-in-memory-password-managers), which suggested using `&Password` since it is common in URL encoding.
 ```
@@ -361,3 +367,6 @@ root@attackdefense:~# strings 3236.dmp | grep -Fi "&Password"
 9tulPaSkxFFKaUnL41P9XwtpMYAAN-4jAqpE9CNWoKJsyiBOG63Gw5J_d4bCfeRbF9xCAf2JFcxZqwmM2BTXXPuclHi0.TDLuTEFn1YpOVWeH1OFCoA&email=target_user%40gmail.com&create=0&password=test_password&metadata1=ECdITeCs%3AZY%2BFmhJxsdk9GZfBP4oKTY4X54qTTLzmabBVOB8u%2FOwfF6ZjDEudP4zwqTzZ1pvgXwSeC3Q7239UojWUODl8l74KqaP9%2F8gmASqL0OXncogWX8EPRAPk1QyNxQ6jEsAo1S0MQtl%2F0SKtkpOkpTU98Iz7jpcXmvtOuHr5lEixhfYHcygO1QvLcMCK%2FF0q7%2FbKv60kYyH4Czqi3jTkPBt0lk39s4UTFHxVbYW8HgWXyP1QoOI1WupXb6e5XKvXw0hkwxSAbiEdcW%2B3W7fxZuV0uBS1G7mMITo2c6CvN8MAYjHL2xbNZdoEgHhgV%2BGqi693%2FBOFrv1WdHv4ZWGaH6AUdjaDqM3QXUSA%2FBDn9jn%2Fu2CttChq2Mx5rjFaP0On95VSFD8HehhI5a%2F7wRE7wv81ECpEKSQmySIFd%2FKooWFD5ZuKVpRap3r9ZTbBi5v%2B%2FnavOPvvR%2BIWT6bS2jhpYQ%2B5gncaWmp%2Bs3MBeeHMtv2qnsWLvxBMGDXnfeJEJPO62ooxR4AnCUJ4zZoGrNYotDl23TzJsK1CXL60vNZQz2bNTmONRWIcviW1aipawqSWCkdoCj2wg6iUqLZkXXPE8t8V%2BP9Vlir7fP%2Fyg2vGiGXyLsYgM4aw9JHAnX4sa88XfdAwW
 ```
 The password for user `target_user@gmail.com` is `test_password`.
+
+---
+I'm greatful for this experience, which was my first ever individual CTF where I solved the challenge pretty much by myself aside from a few hints 😅. May this be the first of many to come!
