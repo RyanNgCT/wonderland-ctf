@@ -101,8 +101,10 @@ Offset(V)          Name                    PID   PPID   Thds     Hnds   Sess  Wo
 0xffffe00194463840 jucheck.exe            3812   5228      0 --------      1      0 2019-06-26 17:57:07 UTC+0000                                 
 0xffffe00194b82840 sppsvc.exe             5480    572      4        0      0      0 2019-06-26 18:04:48 UTC+0000                                 
 0xffffe00195614840 SppExtComObj.E          156    664      1        0      0      0 2019-06-26 21:29:33 UTC+0000                                 
-0xffffe001948d3840 microsip.exe           4284   3556     11        0      1      1 2019-06-26 21:55:39 UTC+0000                                 
-<pre><b>0xffffe0019570a380 notepad.exe            5376   3556      3        0      1      0 2019-06-26 21:58:42 UTC+0000</b></pre>                              
+0xffffe001948d3840 microsip.exe           4284   3556     11        0      1      1 2019-06-26 21:55:39 UTC+0000
+```
+<pre><b>0xffffe0019570a380 notepad.exe            5376   3556      3        0      1      0 2019-06-26 21:58:42 UTC+0000</b></pre>
+```
 0xffffe00194606840 conhost.exe             364   4144      0 --------      1      0 2019-06-26 21:59:50 UTC+0000                                 
 0xffffe00195115840 taskhostw.exe          5252    988      5        0      0      0 2019-06-26 22:07:33 UTC+0000                                 
 0xffffe00193deb840 ngentask.exe           5928   5252      6        0      0      0 2019-06-26 22:07:34 UTC+0000                                 
@@ -112,14 +114,16 @@ Offset(V)          Name                    PID   PPID   Thds     Hnds   Sess  Wo
 0xffffe00191e0c840 firefox.exe            4756   4132      0 -------- ------      0 2019-06-26 22:54:49 UTC+0000                                 
 0xffffe001951c0540 SearchFilterHo         5412   3656      1        0      0      0 2019-06-26 22:54:50 UTC+0000                                 
 0xffffe00194de8840 SearchProtocol         1840   3656      4        0      1      0 2019-06-26 22:54:59 UTC+0000                                 
-0xffffe00192545840 SearchUI.exe           3784    664     34        0      1      0 2019-06-26 22:55:02 UTC+0000                                 
-0xffffe001959e4380 firefox.exe            3236   5136     60        0      1      0 2019-06-26 22:55:42 UTC+0000                                 
+0xffffe00192545840 SearchUI.exe           3784    664     34        0      1      0 2019-06-26 22:55:02 UTC+0000
+```
+<pre><b>0xffffe001959e4380 firefox.exe            3236   5136     60        0      1      0 2019-06-26 22:55:42 UTC+0000
 0xffffe00192959280 firefox.exe            3756   3236      9        0      1      0 2019-06-26 22:55:42 UTC+0000                                 
 0xffffe00194196840 firefox.exe            3628   3236     23        0      1      0 2019-06-26 22:55:50 UTC+0000                                 
 0xffffe001931b9840 firefox.exe            1164   3236     19        0      1      0 2019-06-26 22:55:50 UTC+0000                                 
 0xffffe001937b3080 firefox.exe            4832   3236     23        0      1      0 2019-06-26 22:55:50 UTC+0000                                 
 0xffffe0019593b080 firefox.exe             676   3236      0 --------      1      0 2019-06-26 22:55:52 UTC+0000                                 
-0xffffe00195918080 firefox.exe            2288   3236     19        0      1      0 2019-06-26 22:56:02 UTC+0000                                 
+0xffffe00195918080 firefox.exe            2288   3236     19        0      1      0 2019-06-26 22:56:02 UTC+0000</b></pre>
+```
 0xffffe00194e90840 audiodg.exe            5392    944      6        0      0      0 2019-06-26 22:57:02 UTC+0000                                 
 0xffffe00194b10080 TabTip.exe             3516    880      0 --------      1      0 2019-06-26 22:57:04 UTC+0000                                 
 0xffffe00193ada080 RamCapture64.e         3920   3556     10        0      1      0 2019-06-26 22:57:04 UTC+0000                                 
