@@ -8,7 +8,7 @@ A memory dump of a Windows machine is provided in the home directory of the root
 
   1. What is the process number of the notepad process?
   2. A SIP VoIP client software was running on the machine. What is the IP address of the server that the client was hardcoded to use?
-  3. The user working on the Windows machine was trying to do some shopping on amazon.com. Recover the email address and password of the user.(Flag is the username)
+  3. The user working on the Windows machine was trying to do some shopping on amazon.com. Recover the email address and password of the user. (Flag is the password)
     
 **Guidelines**
 
