@@ -102,7 +102,7 @@ Offset(V)          Name                    PID   PPID   Thds     Hnds   Sess  Wo
 0xffffe00194b82840 sppsvc.exe             5480    572      4        0      0      0 2019-06-26 18:04:48 UTC+0000                                 
 0xffffe00195614840 SppExtComObj.E          156    664      1        0      0      0 2019-06-26 21:29:33 UTC+0000                                 
 0xffffe001948d3840 microsip.exe           4284   3556     11        0      1      1 2019-06-26 21:55:39 UTC+0000                                 
-> 0xffffe0019570a380 notepad.exe            5376   3556      3        0      1      0 2019-06-26 21:58:42 UTC+0000                                 
+<pre><b>0xffffe0019570a380 notepad.exe            5376   3556      3        0      1      0 2019-06-26 21:58:42 UTC+0000</b></pre>                              
 0xffffe00194606840 conhost.exe             364   4144      0 --------      1      0 2019-06-26 21:59:50 UTC+0000                                 
 0xffffe00195115840 taskhostw.exe          5252    988      5        0      0      0 2019-06-26 22:07:33 UTC+0000                                 
 0xffffe00193deb840 ngentask.exe           5928   5252      6        0      0      0 2019-06-26 22:07:34 UTC+0000                                 
@@ -334,6 +334,26 @@ To: <sip:1111@192.168.10.129>
 In the strings the `To` field was specified so that was the server's IP address: `192.168.10.129`.
 
 ## Step 3: 
-This was pretty much an extension of step 2
+This was pretty much an extension of step 2, just that the process id was different and the search string needed to be changed. Since the user was using a gmail account on `amazon.com` and there was no presence of a client application, the most likely application used to conduct this activity was `firefox.exe`, with process number `3236`.
+```
+root@attackdefense:~# vol.py -f memory_dump.mem --profile=Win10x64_10240_17770 memdump -p 3236 --dump-dir .
+Volatility Foundation Volatility Framework 2.6.1
+************************************************************************
+Writing firefox.exe [  3236] to 3236.dmp
+```
+I wrote the executable to the dump file again, similar to the steps taken above and then thereafter proceeded to search the dump file for the password. I identified a few keywords for this section--`email`, `password`, `amazon.com`. Using several search strings, I could not find a password field.
+```
+strings 3236.dmp | grep -Fi "password"
+strings 3236.dmp | grep -Fi "amazon.com"
+strings 3236.dmp | grep -Fi "password\|amazon.com.*amazon.com\|password"
+```
 
+Searching for emails with gmail's "signature" also proved futile.
+`strings 3236.dmp | grep -Fi "@gmail.com"`.
 
+Finally, I chanced upon [this article](https://security.stackexchange.com/questions/85980/how-to-find-passwords-in-memory-password-managers), which suggested using `&Password` since it is common in URL encoding.
+```
+root@attackdefense:~# strings 3236.dmp | grep -Fi "&Password"
+9tulPaSkxFFKaUnL41P9XwtpMYAAN-4jAqpE9CNWoKJsyiBOG63Gw5J_d4bCfeRbF9xCAf2JFcxZqwmM2BTXXPuclHi0.TDLuTEFn1YpOVWeH1OFCoA&email=target_user%40gmail.com&create=0&password=test_password&metadata1=ECdITeCs%3AZY%2BFmhJxsdk9GZfBP4oKTY4X54qTTLzmabBVOB8u%2FOwfF6ZjDEudP4zwqTzZ1pvgXwSeC3Q7239UojWUODl8l74KqaP9%2F8gmASqL0OXncogWX8EPRAPk1QyNxQ6jEsAo1S0MQtl%2F0SKtkpOkpTU98Iz7jpcXmvtOuHr5lEixhfYHcygO1QvLcMCK%2FF0q7%2FbKv60kYyH4Czqi3jTkPBt0lk39s4UTFHxVbYW8HgWXyP1QoOI1WupXb6e5XKvXw0hkwxSAbiEdcW%2B3W7fxZuV0uBS1G7mMITo2c6CvN8MAYjHL2xbNZdoEgHhgV%2BGqi693%2FBOFrv1WdHv4ZWGaH6AUdjaDqM3QXUSA%2FBDn9jn%2Fu2CttChq2Mx5rjFaP0On95VSFD8HehhI5a%2F7wRE7wv81ECpEKSQmySIFd%2FKooWFD5ZuKVpRap3r9ZTbBi5v%2B%2FnavOPvvR%2BIWT6bS2jhpYQ%2B5gncaWmp%2Bs3MBeeHMtv2qnsWLvxBMGDXnfeJEJPO62ooxR4AnCUJ4zZoGrNYotDl23TzJsK1CXL60vNZQz2bNTmONRWIcviW1aipawqSWCkdoCj2wg6iUqLZkXXPE8t8V%2BP9Vlir7fP%2Fyg2vGiGXyLsYgM4aw9JHAnX4sa88XfdAwW
+```
+The password for user `target_user@gmail.com` is `test_password`.
