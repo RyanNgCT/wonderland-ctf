@@ -359,7 +359,7 @@ Searching for emails with gmail's "signature" also proved futile:
 
 `strings 3236.dmp | grep -Fi "@gmail.com"`
 
-This resulted in a bunch of emails that in my opinion, served as a "distraction" and changing the search term to the partcular email did not yield results.
+This resulted in a bunch of emails that in my opinion, served as a "distraction" and changing the search term to the particular email did not yield results/leads moving forward.
 
 Finally, I chanced upon [this article](https://security.stackexchange.com/questions/85980/how-to-find-passwords-in-memory-password-managers), which suggested using `&Password` since it is common in URL encoding.
 ```
