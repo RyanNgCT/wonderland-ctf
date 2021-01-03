@@ -133,7 +133,7 @@ Offset(V)          Name                    PID   PPID   Thds     Hnds   Sess  Wo
 0xffffe00194eba080                      24...0      0      0 -------- ------      0                                                              
 0xffffe00194eba078                      393216      0      0 -------- ------      0 
 ```
-Through observing the output, `notepad.exe` is found with the process id of `4284`.
+Through observing the output, `notepad.exe` is found with the process id of `5376`.
 
 ## Step 2: 
 A Google Search shows that SIP VOIP uses `microsip.exe`. We will need the process id of the program to create another smaller memory dump containing metadata and the data of that particular process.
